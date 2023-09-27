@@ -1,0 +1,43 @@
+﻿@page "/modal/{result}"
+@inject NavigationManager Navigation
+
+<div class="modal fade show" id="myModal" style="display:block; background-color: rgba(10,10,10,.8);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Aviso</h4>
+            </div>
+            <div class="modal-body">
+                <p>@Mensaje</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick=@Ok>OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    public string Mensaje { get; set; }
+
+    [Parameter]
+    public string result { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (result == "True")
+        {
+            Mensaje = "Se ha completado la tarea exitosamente.";
+        }
+        else
+        {
+            Mensaje = "No se pudo completar la tarea";
+        }
+    }
+
+    public void Ok()
+    {
+        Navigation.NavigateTo("/addenda");
+    }
+
+}

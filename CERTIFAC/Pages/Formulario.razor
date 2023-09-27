@@ -1,0 +1,126 @@
+﻿@page "/Formulario/{Id}"
+@inject HttpClient HttpClient
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject IHttpClientFactory ClientFactory
+@inject NavigationManager Navigation
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12" style="text-align:center;">
+            <h1>Formulario de Paciente</h1>
+        </div>
+    </div>
+    <br />
+    <br />
+    <EditForm Model="@addenda">
+        <div class="container-fluid">
+
+            <div class="form-group row mb-3">
+                <div class="col-md-3">
+                    <h5><label>Datos:</label></h5>
+                </div>
+                <div class="col-md-6">
+                    <InputText class="form-control" @bind-Value="@addenda.NombreAddenda"></InputText>
+                </div>
+            </div>
+
+            <div class="form-group row mb-3">
+                <div class="col-md-3">
+                    <h5><label>XML:</label></h5>
+                </div>
+                <div class="col-md-6">
+                    <InputText class="form-control" @bind-Value="@addenda.Xml"></InputText>
+                </div>
+            </div>
+
+            <div class="form-group row mb-3">
+                <div class="col-md-3">
+                    <h5><label>Fecha Modificacion:</label></h5>
+                </div>
+                <div class="col-md-6">
+                    <InputText class="form-control" @bind-Value="@addenda.FechaModificacion"></InputText>
+                </div>
+            </div>
+
+            <div class="form-group row mb-3">
+                <div class="col-md-3">
+                    <h5><label>Usuario:</label></h5>
+                </div>
+                <div class="col-md-6">
+                    <InputText class="form-control" @bind-Value="@addenda.Usuario"></InputText>
+                </div>
+            </div>
+
+       
+
+
+            <br />
+            <br />
+
+
+            <div class="form-group row mb-1">
+                <div class="col-md-1">
+                    <button class="btn btn-success" @onclick="Guardar">Guardar</button>
+                </div>
+                <div class="col-md-1">
+                    <a class="btn btn-danger" href="/addenda">Regresar</a>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+
+    </EditForm>
+</div>
+
+
+
+
+
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    ML.Addenda addenda = new ML.Addenda();
+
+    ML.Result result = new ML.Result();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (Id != string.Empty)
+        {
+            Guid Idguid = Guid.Parse(Id);
+            addenda = await HttpClient.GetFromJsonAsync<ML.Addenda>("Addenda/GetById?guid=" + Id);
+        }
+        else
+        {
+        }
+    }
+
+
+
+
+    private async Task Guardar()
+    {
+        if (addenda.IdAddenda == null)
+        {
+            var response = await HttpClient.PostAsJsonAsync<ML.Addenda>("Addenda/Add", addenda);
+            result = response.Content.ReadFromJsonAsync<ML.Result>().Result;
+        }
+        else
+        {
+            var response = await HttpClient.PutAsJsonAsync<ML.Addenda>("Addenda/Update", addenda);
+            result = response.Content.ReadFromJsonAsync<ML.Result>().Result;
+        }
+        Navigation.NavigateTo("/modal/" + result.Correct);
+    }
+
+}
